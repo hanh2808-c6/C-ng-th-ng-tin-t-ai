@@ -23,13 +23,20 @@ const server = http.createServer((req, res) => {
     }
 
     // Static files
-    let filePath = path.join(__dirname, 'GEMINI', req.url === '/' ? 'index.html' : req.url);
+    let requestUrl = req.url === '/' ? '/index.html' : req.url;
+    if (requestUrl.startsWith('/GEMINI/')) {
+        requestUrl = requestUrl.replace(/^\/GEMINI/, '') || '/index.html';
+    }
+
+    requestUrl = path.normalize(requestUrl).replace(/^(\\.\\.[\\/\\\\])+/, '');
+    const filePath = path.join(__dirname, requestUrl);
 
     const ext = path.extname(filePath);
     let contentType = 'text/html';
     switch (ext) {
         case '.css': contentType = 'text/css'; break;
         case '.js': contentType = 'text/javascript'; break;
+        case '.json': contentType = 'application/json'; break;
         case '.avif': contentType = 'image/avif'; break;
     }
 

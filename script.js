@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function loadDocuments() {
-    fetch('/data/van_ban_phap_luat_dat_dai.json')
+    fetch('/van_ban_phap_luat_dat_dai.json')
         .then(res => {
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             return res.json();
