@@ -1,32 +1,18 @@
 // ===== API Configuration =====
-// API Key được tải từ server (lưu trữ trong .env)
-let API_KEY_PLACEHOLDER = null;
+// CẢNH BÁO: API Key không nên hardcode - sử dụng environment variables
+const API_KEY_PLACEHOLDER = "AIzaSyCAU4oWw6fH0TxT0Vol6rtaEdxKpIORgyE";
+
 let mockDocs = [];
 
-// Fetch config từ server
-async function loadConfig() {
-    try {
-        const response = await fetch('/api/config');
-        if (!response.ok) throw new Error('Failed to load config');
-        const config = await response.json();
-        API_KEY_PLACEHOLDER = config.apiKey;
-        console.log('Config loaded successfully');
-    } catch (err) {
-        console.error('Failed to load API config:', err);
-        API_KEY_PLACEHOLDER = 'MISSING_API_KEY';
-    }
-}
-
 // ===== Initialize Documents =====
-document.addEventListener('DOMContentLoaded', async () => {
-    await loadConfig(); // Load API key from server first
+document.addEventListener('DOMContentLoaded', () => {
     loadDocuments();
     updateDate();
     setupEventListeners();
 });
 
 function loadDocuments() {
-    fetch('/van_ban_phap_luat_dat_dai.json')
+    fetch('van_ban_phap_luat_dat_dai.json')
         .then(res => {
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             return res.json();
@@ -237,7 +223,7 @@ async function summarizeAI(docId) {
     try {
         const prompt = `Phân tích tóm tắt văn bản pháp luật sau bằng tiếng Việt: ${doc.title}. Mô tả: ${doc.excerpt}. Hãy chỉ ra 3 điểm quan trọng nhất mà người dân cần lưu ý.`;
         
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY_PLACEHOLDER}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY_PLACEHOLDER}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -343,7 +329,7 @@ async function sendChat() {
         const intent = detectIntent(question);
         const systemPrompt = `Bạn là trợ lý ảo của Cổng Thông tin Pháp luật Đất đai Chính phủ Việt Nam. Hãy trả lời các câu hỏi về luật đất đai (đặc biệt là Luật Đất đai 2024) một cách trang trọng, chính xác và dễ hiểu. Trích dẫn các điều luật nếu có thể.\n\nChủ đề người dùng hỏi: ${intent}`;
         
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY_PLACEHOLDER}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY_PLACEHOLDER}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
