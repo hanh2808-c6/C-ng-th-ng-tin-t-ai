@@ -237,7 +237,7 @@ async function summarizeAI(docId) {
     try {
         const prompt = `Phân tích tóm tắt văn bản pháp luật sau bằng tiếng Việt: ${doc.title}. Mô tả: ${doc.excerpt}. Hãy chỉ ra 3 điểm quan trọng nhất mà người dân cần lưu ý.`;
         
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY_PLACEHOLDER}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY_PLACEHOLDER}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -343,7 +343,7 @@ async function sendChat() {
         const intent = detectIntent(question);
         const systemPrompt = `Bạn là trợ lý ảo của Cổng Thông tin Pháp luật Đất đai Chính phủ Việt Nam. Hãy trả lời các câu hỏi về luật đất đai (đặc biệt là Luật Đất đai 2024) một cách trang trọng, chính xác và dễ hiểu. Trích dẫn các điều luật nếu có thể.\n\nChủ đề người dùng hỏi: ${intent}`;
         
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY_PLACEHOLDER}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY_PLACEHOLDER}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
