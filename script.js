@@ -1,6 +1,10 @@
 // ===== API Configuration =====
+<<<<<<< HEAD
 // CẢNH BÁO: API Key không nên hardcode - sử dụng environment variables
 const API_KEY_PLACEHOLDER = "AIzaSyCQrKBrne7P8F8jY_I6kOv9bUf3Jw_SblA";
+=======
+// API key được lưu trên server, frontend sẽ gọi endpoint proxy để tránh lộ key.
+>>>>>>> 1792561684aee9518dfd58252649009eff4ff3c8
 
 let mockDocs = [];
 
@@ -213,44 +217,28 @@ async function summarizeAI(docId) {
     summaryArea.classList.remove('hidden');
     summaryContent.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i>Đang yêu cầu trí tuệ nhân tạo phân tích nội dung văn bản...';
 
-    // Check API Key
-    if (API_KEY_PLACEHOLDER === "YOUR_API_KEY_HERE") {
-        summaryContent.innerHTML = '<span class="text-red-500">⚠️ Lỗi: API Key chưa được cấu hình. Vui lòng thiết lập biến môi trường.</span>';
-        console.warn('API Key is not configured properly');
-        return;
-    }
-
     try {
-        const prompt = `Phân tích tóm tắt văn bản pháp luật sau bằng tiếng Việt: ${doc.title}. Mô tả: ${doc.excerpt}. Hãy chỉ ra 3 điểm quan trọng nhất mà người dân cần lưu ý.`;
-        
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY_PLACEHOLDER}`, {
+        const response = await fetch('/api/ai-summary', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }]
+                title: doc.title || '',
+                excerpt: doc.excerpt || doc.fullText || ''
             })
         });
-        
+
         if (!response.ok) {
-            const errText = await response.text();
-            console.error('AI summary API error', response.status, errText);
-            
-            if (response.status === 401) {
-                summaryContent.innerHTML = '<span class="text-red-500">❌ Lỗi: API Key không hợp lệ hoặc không được phép</span>';
-            } else if (response.status === 429) {
-                summaryContent.innerHTML = '<span class="text-orange-500">⚠️ Lỗi: Quá nhiều yêu cầu. Vui lòng chờ và thử lại</span>';
-            } else {
-                summaryContent.innerHTML = `<span class="text-red-500">❌ Lỗi AI (${response.status})</span>`;
-            }
-            return;
+            const errorBody = await response.json().catch(() => null);
+            const message = errorBody?.error || `${response.status} ${response.statusText}`;
+            throw new Error(message);
         }
-        
+
         const data = await response.json();
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Không thể thực hiện tóm tắt lúc này.";
+        const text = data.success && data.text ? data.text : 'Không nhận được phản hồi từ AI.';
         summaryContent.innerHTML = `<div class="whitespace-pre-line">${escapeHtml(text)}</div>`;
     } catch (error) {
         console.error('AI summary fetch failed', error);
-        summaryContent.innerHTML = `<span class="text-red-500">❌ Lỗi: ${error.message}. Kiểm tra console để biết chi tiết.</span>`;
+        summaryContent.innerHTML = `<span class="text-red-500">❌ Lỗi: ${escapeHtml(error.message)}. Kiểm tra console để biết chi tiết.</span>`;
     }
 }
 
@@ -319,23 +307,13 @@ async function sendChat() {
     chatBox.appendChild(aiDiv);
     chatBox.scrollTop = chatBox.scrollHeight;
 
-    // Check API Key
-    if (API_KEY_PLACEHOLDER === "YOUR_API_KEY_HERE") {
-        document.getElementById(aiId).innerHTML = '<span class="text-red-500">⚠️ Lỗi: API Key chưa được cấu hình</span>';
-        return;
-    }
-
     try {
-        const intent = detectIntent(question);
-        const systemPrompt = `Bạn là trợ lý ảo của Cổng Thông tin Pháp luật Đất đai Chính phủ Việt Nam. Hãy trả lời các câu hỏi về luật đất đai (đặc biệt là Luật Đất đai 2024) một cách trang trọng, chính xác và dễ hiểu. Trích dẫn các điều luật nếu có thể.\n\nChủ đề người dùng hỏi: ${intent}`;
         
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY_PLACEHOLDER}`, {
+        const sources = findRelevantDocs(question, 3);
+        const response = await fetch('/api/ai-chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: question }] }],
-                systemInstruction: { parts: [{ text: systemPrompt }] }
-            })
+            body: JSON.stringify({ question, sources })
         });
         
         if (!response.ok) {

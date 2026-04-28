@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Environment variables
 .env
 .env.local
@@ -25,3 +26,7 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+=======
+node_modules/
+.env
+>>>>>>> 1792561684aee9518dfd58252649009eff4ff3c8

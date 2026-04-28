@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8" />
@@ -111,6 +111,7 @@
                 <button id="loadHistoryBtn" class="text-xs bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700">Load</button>
             </div>
             <div id="chatBox" class="flex-1 overflow-y-auto bg-gray-50 rounded p-4 space-y-3 border border-gray-200"></div>
+            <div id="docViewer" class="hidden mt-4 bg-white border border-gray-200 rounded shadow-sm"></div>
             <div class="mt-4 flex gap-2">
                 <input id="chatInput" type="text" placeholder="Nhập câu hỏi của bạn về đất đai..." class="flex-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gov-blue" />
                 <button id="sendBtn" class="bg-gov-red text-white px-4 py-2 rounded hover:bg-red-700">Gửi</button>
@@ -123,6 +124,7 @@
             &copy; 2026 Cổng Thông tin Pháp luật Đất đai.
         </div>
     </footer>
+    <script src="script.js"></script>
     <script>
         function escapeHtml(str) {
             if (!str) return '';
@@ -219,6 +221,41 @@
             renderHistory();
         }
 
+        function findRelevantDocs(question, topK = 3) {
+            if (!Array.isArray(mockDocs) || !mockDocs.length) return [];
+            const query = question.toLowerCase();
+            const words = query.split(/\W+/).filter(Boolean);
+            return mockDocs
+                .map(doc => {
+                    const text = `${doc.title || ''} ${doc.excerpt || ''} ${doc.fullText || ''} ${doc.type || ''} ${doc.agency || ''}`.toLowerCase();
+                    const score = words.reduce((sum, word) => sum + (text.includes(word) ? 1 : 0), 0);
+                    return { ...doc, score };
+                })
+                .filter(doc => doc.score > 0)
+                .sort((a, b) => b.score - a.score)
+                .slice(0, topK);
+        }
+
+        function generateLocalAIAnswer(question, sources) {
+            if (!question) return 'Xin lỗi, tôi cần một câu hỏi để trả lời.';
+            if (!sources || !sources.length) {
+                return 'Tôi đã tìm trong dữ liệu nhưng chưa tìm thấy nội dung phù hợp. Vui lòng hỏi bằng câu hỏi rõ ràng hơn hoặc kiểm tra lại dữ liệu.';
+            }
+
+            const best = sources[0];
+            const title = best.title || 'văn bản liên quan';
+            const excerpt = best.excerpt || best.fullText || 'Nội dung chi tiết không có sẵn.';
+            const agency = best.agency ? ` (${best.agency})` : '';
+            const sourceText = sources.length > 1
+                ? `
+
+Các nguồn tham khảo khác:
+${sources.slice(1).map((s, idx) => `${idx + 1}. ${s.title || 'Văn bản'} (${s.type || 'N/A'})`).join('\n')}`
+                : '';
+
+            return `Theo tài liệu "${title}"${agency}, nội dung liên quan là: ${excerpt}${sourceText}`;
+        }
+
         async function sendChat() {
             const question = input.value.trim();
             if (!question) return;
@@ -235,47 +272,25 @@
             chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
-                // Step 1: Vector search để tìm relevant documents
-                let vectorContext = '';
-                let sources = [];
-                try {
-                    const vectorResp = await fetch('/api/vector-search', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ query: question, topK: 3 })
-                    });
-                    if (vectorResp.ok) {
-                        const vectorData = await vectorResp.json();
-                        if (vectorData.success && vectorData.results.length > 0) {
-                            sources = vectorData.results;
-                            vectorContext = vectorData.results
-                                .map(r => `- ${r.title} (${r.type}, độ tương tự: ${(r.similarity * 100).toFixed(1)}%)`)
-                                .join('\n');
-                        }
-                    }
-                } catch (err) {
-                    console.warn('Vector search failed:', err);
-                    // Continue without vector context
-                }
+                const sources = findRelevantDocs(question, 3);
 
-                // Step 2: Build system prompt with vector context
-                let systemPrompt = `Bạn là chuyên gia pháp luật đất đai Việt Nam. Trả lời ngắn gọn, chính xác và trích nguồn luật. Người dùng hỏi: "${question}".`;
-                
-                if (vectorContext) {
-                    systemPrompt += `\n\nCác tài liệu liên quan được tìm thấy:\n${vectorContext}`;
-                }
-
-                // Step 3: Call Gemini API
                 const response = await fetch('/api/ai-chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ messages: [{ role: 'user', parts: [{ text: question }] }], systemPrompt })
+                    body: JSON.stringify({ question, sources })
                 });
-                if (!response.ok) throw new Error('HTTP ' + response.status);
-                const data = await response.json();
-                if (!data.success) throw new Error(data.error || 'Không thể lấy phản hồi AI');
 
-                const aiText = (data.text || 'Xin lỗi, tôi chưa tìm được câu trả lời rõ ràng.').trim();
+                if (!response.ok) {
+                    const errorBody = await response.json().catch(() => null);
+                    const message = errorBody?.error || `${response.status} ${response.statusText}`;
+                    throw new Error(message);
+                }
+
+                const data = await response.json();
+                const aiText = (data.success && data.text)
+                    ? data.text.trim()
+                    : (data.error ? `Lỗi AI: ${data.error}` : 'Không nhận được phản hồi từ AI.');
+
                 const aiElements = document.getElementById(placeholderId);
                 if (aiElements) {
                     let sourceHtml = '';
