@@ -1,17 +1,16 @@
-<<<<<<< HEAD
+
 import 'dotenv/config.js';
 import http from 'http';
 import fs from 'fs';
-=======
+
 import express from 'express';
->>>>>>> 1792561684aee9518dfd58252649009eff4ff3c8
+
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-<<<<<<< HEAD
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
@@ -39,7 +38,7 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT} [${NODE_ENV}]`);
-=======
+
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
@@ -214,5 +213,6 @@ app.post('/api/ai-chat', async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`AI backend đang chạy trên http://localhost:${PORT}`);
->>>>>>> 1792561684aee9518dfd58252649009eff4ff3c8
+
+});
 });

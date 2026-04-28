@@ -1,10 +1,9 @@
 // ===== API Configuration =====
-<<<<<<< HEAD
+
 // CẢNH BÁO: API Key không nên hardcode - sử dụng environment variables
 const API_KEY_PLACEHOLDER = "AIzaSyCQrKBrne7P8F8jY_I6kOv9bUf3Jw_SblA";
-=======
+
 // API key được lưu trên server, frontend sẽ gọi endpoint proxy để tránh lộ key.
->>>>>>> 1792561684aee9518dfd58252649009eff4ff3c8
 
 let mockDocs = [];
 
