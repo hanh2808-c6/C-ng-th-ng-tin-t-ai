@@ -1,6 +1,6 @@
 // ===== API Configuration =====
 // CẢNH BÁO: API Key không nên hardcode - sử dụng environment variables
-const API_KEY_PLACEHOLDER = "AIzaSyDaqGi68hqkqOb3FBH_HJ6LCPAHIWuEPc4";
+const API_KEY_PLACEHOLDER = "AIzaSyCPE1JE3yYbEQa_AuVAUbm3ByjjsW-cx04";
 
 let mockDocs = [];
 
