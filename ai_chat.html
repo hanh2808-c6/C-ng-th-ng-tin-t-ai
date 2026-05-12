@@ -24,7 +24,7 @@
             display: -webkit-box;
             -webkit-line-clamp: 2;
             line-clamp: 2;
-            -webkit-box-orient: vertical;  
+            -webkit-box-orient: vertical;
             overflow: hidden;
         }
         .filter-btn { font-weight: 600; border: 1px solid #ddd; }
@@ -65,9 +65,10 @@
                 </div>
             </div>
             <div class="w-full md:w-72 relative">
-                <input type="text" id="globalSearch" placeholder="Tìm kiếm văn bản..." 
+                <input type="text" id="globalSearch" placeholder="Tìm kiếm văn bản..."
                        class="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-gov-red shadow-inner">
-                <button onclick="doSearch(document.getElementById('globalSearch').value.trim())" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gov-red">
+                <button onclick="window.location.href='index.html?q='+encodeURIComponent(document.getElementById('globalSearch').value.trim())"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gov-red">
                     <i class="fas fa-search"></i>
                 </button>
             </div>
@@ -78,21 +79,34 @@
     <nav class="bg-gov-blue text-white sticky top-0 z-50">
         <div class="container mx-auto px-4">
             <ul class="flex overflow-x-auto whitespace-nowrap text-sm font-bold uppercase py-1">
-                <li><a href="index.html" id="homeNav" onclick="setNavActive(this)" class="inline-block px-4 py-3 nav-link border-r border-blue-800 bg-white/10"><i class="fas fa-home"></i></a></li>
+                <li>
+                    <a href="index.html" id="homeNav" class="inline-block px-4 py-3 nav-link border-r border-blue-800 bg-white/10">
+                        <i class="fas fa-home"></i>
+                    </a>
+                </li>
                 <li class="relative">
-                    <a href="chinhsachmoi.html" id="policyMainLink" onclick="setNavActive(this); toggleDropdown('policyDropdown'); setPolicyActive('main');" class="policy-link inline-block px-4 py-3 nav-link border-r border-blue-800">Chính sách mới</a>
+                    <!-- FIX A: Tách navigate và toggle như đã sửa ở index.html -->
+                    <span class="inline-flex items-center border-r border-blue-800">
+                        <a href="chinhsachmoi.html" id="policyMainLink" class="policy-link inline-block px-3 py-3 nav-link">Chính sách mới</a>
+                        <button onclick="toggleDropdown('policyDropdown')"
+                                class="px-2 py-3 nav-link hover:bg-white/20 focus:outline-none"
+                                aria-label="Mở menu chính sách">
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                    </span>
                     <ul class="absolute left-0 top-full bg-white shadow-md hidden z-10 min-w-[200px]" id="policyDropdown">
-                        <li><a href="#" id="policy_price" onclick="setPolicyActive('Chính sách về giá đất 2024')" class="policy-item block px-4 py-2 hover:bg-gray-100 text-sm">Chính sách về giá đất 2024</a></li>
-                        <li><a href="#" id="policy_compensation" onclick="setPolicyActive('Chính sách bồi thường thu hồi đất')" class="policy-item block px-4 py-2 hover:bg-gray-100 text-sm">Chính sách bồi thường thu hồi đất</a></li>
-                        <li><a href="#" id="policy_registration" onclick="setPolicyActive('Chính sách đăng ký đất đai online')" class="policy-item block px-4 py-2 hover:bg-gray-100 text-sm">Chính sách đăng ký đất đai online</a></li>
-                        <li><a href="#" id="policy_relocation" onclick="setPolicyActive('Chính sách hỗ trợ tái định cư')" class="policy-item block px-4 py-2 hover:bg-gray-100 text-sm">Chính sách hỗ trợ tái định cư</a></li>
+                        <li><a href="#" class="policy-item block px-4 py-2 hover:bg-gray-100 text-sm text-gray-800">Chính sách về giá đất 2024</a></li>
+                        <li><a href="#" class="policy-item block px-4 py-2 hover:bg-gray-100 text-sm text-gray-800">Chính sách bồi thường thu hồi đất</a></li>
+                        <li><a href="#" class="policy-item block px-4 py-2 hover:bg-gray-100 text-sm text-gray-800">Chính sách đăng ký đất đai online</a></li>
+                        <li><a href="#" class="policy-item block px-4 py-2 hover:bg-gray-100 text-sm text-gray-800">Chính sách hỗ trợ tái định cư</a></li>
                     </ul>
                 </li>
-                <li><a href="vanbanquypham.html" id="vbqpNav" onclick="setNavActive(this)" class="inline-block px-4 py-3 nav-link border-r border-blue-800">Văn bản quy phạm</a></li>
+                <li><a href="vanbanquypham.html" id="vbqpNav" class="inline-block px-4 py-3 nav-link border-r border-blue-800">Văn bản quy phạm</a></li>
                 <li><a href="ai_chat.html" id="aiNav" class="inline-block px-4 py-3 nav-link">Tương tác AI</a></li>
             </ul>
         </div>
     </nav>
+
     <main class="container mx-auto px-4 py-6 flex-1 grid grid-cols-1 md:grid-cols-4 gap-6">
         <!-- Left history panel -->
         <aside class="md:col-span-1 bg-white rounded shadow-sm border border-gray-200 p-4 h-[650px] overflow-y-auto">
@@ -108,22 +122,27 @@
         <section class="md:col-span-3 bg-white rounded shadow-sm border border-gray-200 p-4 flex flex-col h-[650px]">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="font-bold text-lg text-gov-blue">Hộp Chat Trợ lý Luật Đất đai</h2>
-                <button id="loadHistoryBtn" class="text-xs bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700">Load</button>
+                <!-- FIX B: Đổi "Load" thành "Làm mới" và giải thích rõ hơn, vì localStorage đã được load khi DOMContentLoaded -->
+                <button id="loadHistoryBtn" class="text-xs bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700" title="Tải lại lịch sử từ bộ nhớ">Làm mới</button>
             </div>
             <div id="chatBox" class="flex-1 overflow-y-auto bg-gray-50 rounded p-4 space-y-3 border border-gray-200"></div>
             <div class="mt-4 flex gap-2">
-                <input id="chatInput" type="text" placeholder="Nhập câu hỏi của bạn về đất đai..." class="flex-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gov-blue" />
+                <input id="chatInput" type="text" placeholder="Nhập câu hỏi của bạn về đất đai..."
+                       class="flex-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gov-blue" />
                 <button id="sendBtn" class="bg-gov-red text-white px-4 py-2 rounded hover:bg-red-700">Gửi</button>
             </div>
             <p class="text-xs text-gray-500 mt-2">*Nội dung AI chỉ mang tính chất tham khảo. Kiểm tra văn bản gốc trước khi đối chiếu pháp lý.</p>
         </section>
     </main>
+
     <footer class="bg-[#222] text-gray-400 py-10 border-t-8 border-gov-red">
         <div class="container mx-auto px-4 text-sm text-center">
             &copy; 2026 Cổng Thông tin Pháp luật Đất đai.
         </div>
     </footer>
+
     <script>
+        // ===== Tiện ích =====
         function escapeHtml(str) {
             if (!str) return '';
             const div = document.createElement('div');
@@ -131,14 +150,36 @@
             return div.innerHTML;
         }
 
-        const storageKey = 'aiChatHistory';
-        let chatHistory = [];
+        // ===== Dropdown (nhất quán với index.html) =====
+        let dropdownCloseHandler = null;
+        function toggleDropdown(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const isHidden = el.classList.contains('hidden');
+            document.querySelectorAll('[id$="Dropdown"]').forEach(d => d.classList.add('hidden'));
+            if (isHidden) {
+                el.classList.remove('hidden');
+                if (dropdownCloseHandler) document.removeEventListener('click', dropdownCloseHandler);
+                dropdownCloseHandler = function(e) {
+                    if (!el.contains(e.target)) {
+                        el.classList.add('hidden');
+                        document.removeEventListener('click', dropdownCloseHandler);
+                        dropdownCloseHandler = null;
+                    }
+                };
+                setTimeout(() => document.addEventListener('click', dropdownCloseHandler), 0);
+            }
+        }
 
-        const chatBox = document.getElementById('chatBox');
-        const input = document.getElementById('chatInput');
-        const sendBtn = document.getElementById('sendBtn');
+        // ===== Lịch sử chat =====
+        const storageKey = 'aiChatHistory';
+        let chatHistory  = [];
+
+        const chatBox        = document.getElementById('chatBox');
+        const input          = document.getElementById('chatInput');
+        const sendBtn        = document.getElementById('sendBtn');
         const clearHistoryBtn = document.getElementById('clearHistoryBtn');
-        const loadHistoryBtn = document.getElementById('loadHistoryBtn');
+        const loadHistoryBtn  = document.getElementById('loadHistoryBtn');
 
         function saveHistory() {
             localStorage.setItem(storageKey, JSON.stringify(chatHistory));
@@ -151,7 +192,7 @@
         }
 
         function renderHistoryList() {
-            const historyList = document.getElementById('historyList');
+            const historyList  = document.getElementById('historyList');
             const historyEmpty = document.getElementById('historyEmpty');
             historyList.innerHTML = '';
 
@@ -162,11 +203,15 @@
             }
             historyEmpty.classList.add('hidden');
 
-            questions.reverse().forEach(item => {
+            // Mới nhất lên trên — slice() trước để không mutate chatHistory gốc
+            questions.slice().reverse().forEach(item => {
                 const qItem = document.createElement('div');
                 qItem.className = 'bg-gray-100 hover:bg-gray-200 p-2 rounded border border-gray-200 cursor-pointer text-sm';
                 qItem.title = item.text;
-                qItem.innerHTML = `<div class="font-semibold">${escapeHtml(item.text.length > 60 ? item.text.slice(0, 60) + '...' : item.text)}</div><div class="text-xs text-gray-500">${new Date(item.when).toLocaleString('vi-VN')}</div>`;
+                qItem.innerHTML = `
+                    <div class="font-semibold">${escapeHtml(item.text.length > 60 ? item.text.slice(0, 60) + '...' : item.text)}</div>
+                    <div class="text-xs text-gray-500">${new Date(item.when).toLocaleString('vi-VN')}</div>
+                `;
                 qItem.addEventListener('click', () => {
                     input.value = item.text;
                     input.focus();
@@ -183,17 +228,20 @@
                 return;
             }
             chatHistory.forEach(item => {
+                const m = document.createElement('div');
                 if (item.role === 'user') {
-                    const m = document.createElement('div');
                     m.className = 'flex justify-end gap-2';
                     m.innerHTML = `<div class="bg-gov-blue text-white p-3 rounded-lg shadow-sm max-w-[85%]">${escapeHtml(item.text)}</div>`;
-                    chatBox.appendChild(m);
                 } else {
-                    const m = document.createElement('div');
                     m.className = 'flex items-start gap-2';
-                    m.innerHTML = `<div class="w-8 h-8 rounded-full bg-gov-red flex items-center justify-center text-white shrink-0"><i class="fas fa-robot text-xs"></i></div><div class="bg-white p-3 rounded-lg border shadow-sm max-w-[85%] whitespace-pre-line">${escapeHtml(item.text)}</div>`;
-                    chatBox.appendChild(m);
+                    m.innerHTML = `
+                        <div class="w-8 h-8 rounded-full bg-gov-red flex items-center justify-center text-white shrink-0">
+                            <i class="fas fa-robot text-xs"></i>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg border shadow-sm max-w-[85%] whitespace-pre-line">${escapeHtml(item.text)}</div>
+                    `;
                 }
+                chatBox.appendChild(m);
             });
             chatBox.scrollTop = chatBox.scrollHeight;
             renderHistoryList();
@@ -201,41 +249,58 @@
 
         function loadHistory() {
             const saved = localStorage.getItem(storageKey);
-            if (saved) {
-                try {
-                    chatHistory = JSON.parse(saved);
-                } catch (e) {
-                    chatHistory = [];
-                }
-            } else {
+            try {
+                chatHistory = saved ? JSON.parse(saved) : [];
+            } catch (e) {
                 chatHistory = [];
             }
             renderHistory();
         }
 
+        // FIX C: appendMessage chỉ push + save, không gọi renderHistory
+        //        để tránh render trùng khi sendChat() đã tự render placeholder
         function appendMessage(role, text) {
             chatHistory.push({ role, text, when: new Date().toISOString() });
             saveHistory();
-            renderHistory();
+            renderHistoryList(); // chỉ cập nhật danh sách bên trái, không rebuild toàn bộ chatBox
         }
 
+        // ===== Gửi chat =====
         async function sendChat() {
             const question = input.value.trim();
             if (!question) return;
 
+            // Hiển thị tin nhắn người dùng ngay lập tức (không qua renderHistory để giữ placeholder)
+            const userMsg = document.createElement('div');
+            userMsg.className = 'flex justify-end gap-2';
+            userMsg.innerHTML = `<div class="bg-gov-blue text-white p-3 rounded-lg shadow-sm max-w-[85%]">${escapeHtml(question)}</div>`;
+            chatBox.appendChild(userMsg);
+
             appendMessage('user', question);
             input.value = '';
 
+            // Placeholder AI
             const placeholderId = 'ai-placeholder-' + Date.now();
             const placeholder = document.createElement('div');
             placeholder.className = 'flex items-start gap-2';
             placeholder.id = placeholderId;
-            placeholder.innerHTML = `<div class="w-8 h-8 rounded-full bg-gov-red flex items-center justify-center text-white shrink-0"><i class="fas fa-gavel text-xs"></i></div><div class="bg-white p-3 rounded-lg border shadow-sm max-w-[85%]"><i class="fas fa-spinner fa-spin mr-2"></i>Đang tra cứu...</div>`;
+            placeholder.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-gov-red flex items-center justify-center text-white shrink-0">
+                    <i class="fas fa-gavel text-xs"></i>
+                </div>
+                <div class="bg-white p-3 rounded-lg border shadow-sm max-w-[85%]">
+                    <i class="fas fa-spinner fa-spin mr-2"></i>Đang tra cứu...
+                </div>
+            `;
             chatBox.appendChild(placeholder);
             chatBox.scrollTop = chatBox.scrollHeight;
 
+            // Tắt nút gửi khi đang chờ AI
+            sendBtn.disabled = true;
+            sendBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
             try {
-                // Step 1: Vector search để tìm relevant documents
+                // Step 1: Vector search (optional)
                 let vectorContext = '';
                 let sources = [];
                 try {
@@ -254,48 +319,70 @@
                         }
                     }
                 } catch (err) {
-                    console.warn('Vector search failed:', err);
-                    // Continue without vector context
+                    console.warn('Vector search không khả dụng:', err);
                 }
 
-                // Step 2: Build system prompt with vector context
+                // Step 2: Build prompt
                 let systemPrompt = `Bạn là chuyên gia pháp luật đất đai Việt Nam. Trả lời ngắn gọn, chính xác và trích nguồn luật. Người dùng hỏi: "${question}".`;
-                
                 if (vectorContext) {
                     systemPrompt += `\n\nCác tài liệu liên quan được tìm thấy:\n${vectorContext}`;
                 }
 
-                // Step 3: Call Gemini API
+                // Step 3: Gọi API
                 const response = await fetch('/api/ai-chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ messages: [{ role: 'user', parts: [{ text: question }] }], systemPrompt })
+                    body: JSON.stringify({ question, sources })  // FIX D: gửi đúng field mà server.js expect
                 });
                 if (!response.ok) throw new Error('HTTP ' + response.status);
                 const data = await response.json();
                 if (!data.success) throw new Error(data.error || 'Không thể lấy phản hồi AI');
 
                 const aiText = (data.text || 'Xin lỗi, tôi chưa tìm được câu trả lời rõ ràng.').trim();
-                const aiElements = document.getElementById(placeholderId);
-                if (aiElements) {
+
+                // Cập nhật placeholder
+                const aiEl = document.getElementById(placeholderId);
+                if (aiEl) {
                     let sourceHtml = '';
                     if (sources.length > 0) {
-                        sourceHtml = `<div class="mt-2 pt-2 border-t border-gray-200 text-xs text-gray-600">
-                            <strong>📚 Nguồn tham khảo:</strong>
-                            ${sources.map(s => `<div>• ${escapeHtml(s.title)} (${escapeHtml(s.type)})</div>`).join('')}
-                        </div>`;
+                        sourceHtml = `
+                            <div class="mt-2 pt-2 border-t border-gray-200 text-xs text-gray-600">
+                                <strong>📚 Nguồn tham khảo:</strong>
+                                ${sources.map(s => `<div>• ${escapeHtml(s.title)} (${escapeHtml(s.type)})</div>`).join('')}
+                            </div>`;
                     }
-                    aiElements.innerHTML = `<div class="w-8 h-8 rounded-full bg-gov-red flex items-center justify-center text-white shrink-0"><i class="fas fa-robot text-xs"></i></div><div class="bg-white p-3 rounded-lg border shadow-sm max-w-[85%] whitespace-pre-line"><div>${escapeHtml(aiText)}</div>${sourceHtml}</div>`;
+                    aiEl.innerHTML = `
+                        <div class="w-8 h-8 rounded-full bg-gov-red flex items-center justify-center text-white shrink-0">
+                            <i class="fas fa-robot text-xs"></i>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg border shadow-sm max-w-[85%] whitespace-pre-line">
+                            <div>${escapeHtml(aiText)}</div>${sourceHtml}
+                        </div>
+                    `;
                 }
+
+                // FIX C: appendMessage ở đây chỉ lưu + cập nhật sidebar, không render lại chatBox
                 appendMessage('assistant', aiText);
+
             } catch (error) {
-                const aiElements = document.getElementById(placeholderId);
-                if (aiElements) {
-                    aiElements.innerHTML = `<div class="w-8 h-8 rounded-full bg-gov-red flex items-center justify-center text-white shrink-0"><i class="fas fa-robot text-xs"></i></div><div class="bg-white p-3 rounded-lg border shadow-sm max-w-[85%] text-red-600">Lỗi kết nối AI: ${escapeHtml(error.message)}</div>`;
+                const aiEl = document.getElementById(placeholderId);
+                if (aiEl) {
+                    aiEl.innerHTML = `
+                        <div class="w-8 h-8 rounded-full bg-gov-red flex items-center justify-center text-white shrink-0">
+                            <i class="fas fa-robot text-xs"></i>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg border shadow-sm max-w-[85%] text-red-600">
+                            Lỗi kết nối AI: ${escapeHtml(error.message)}
+                        </div>
+                    `;
                 }
-                console.error(error);
+                console.error('sendChat error:', error);
+            } finally {
+                // FIX E: Luôn bật lại nút gửi dù thành công hay lỗi
+                sendBtn.disabled = false;
+                sendBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                chatBox.scrollTop = chatBox.scrollHeight;
             }
-            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
         function clearHistory() {
@@ -311,27 +398,38 @@
             document.getElementById('aiNav')?.classList.add('active');
         }
 
-        window.addEventListener('load', function() {
+        function updateDate() {
+            const now  = new Date();
+            const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+            const d    = now.getDate().toString().padStart(2, '0');
+            const m    = (now.getMonth() + 1).toString().padStart(2, '0');
+            document.getElementById('currentDate').innerHTML =
+                `<i class="fas fa-calendar-alt mr-1"></i> ${days[now.getDay()]}, ngày ${d}/${m}/${now.getFullYear()}`;
+        }
+
+        // ===== Khởi động =====
+        window.addEventListener('load', function () {
             updateDate();
-            setInterval(updateDate, 60000);
             highlightCurrentPageNav();
             loadHistory();
+
             sendBtn.addEventListener('click', sendChat);
-            input.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChat(); });
+            input.addEventListener('keypress', e => { if (e.key === 'Enter') sendChat(); });
             clearHistoryBtn.addEventListener('click', clearHistory);
+            // FIX B: loadHistoryBtn giờ đơn giản là tải lại từ localStorage
             loadHistoryBtn.addEventListener('click', loadHistory);
         });
 
-        function updateDate() {
-            const now = new Date();
-            const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-            const day = days[now.getDay()];
-            const date = now.getDate().toString().padStart(2, '0');
-            const month = (now.getMonth() + 1).toString().padStart(2, '0');
-            const year = now.getFullYear();
-            document.getElementById('currentDate').innerHTML = `<i class="fas fa-calendar-alt mr-1"></i> ${day}, ngày ${date}/${month}/${year}`;
-        }
+        // FIX F: visibilitychange để tạm dừng interval khi tab không active
+        let dateInterval = setInterval(updateDate, 60_000);
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                clearInterval(dateInterval);
+            } else {
+                updateDate();
+                dateInterval = setInterval(updateDate, 60_000);
+            }
+        });
     </script>
 </body>
 </html>
-
